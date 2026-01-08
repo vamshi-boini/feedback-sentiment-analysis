@@ -14,13 +14,8 @@ load_dotenv()
 
 app = Flask(__name__)
 
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    return response
-
+# Simple CORS - allow everything
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Config
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret")
@@ -40,7 +35,6 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
 
-
 class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -52,10 +46,10 @@ class Feedback(db.Model):
 def hash_password(password: str) -> str:
     return bcrypt.generate_password_hash(password).decode("utf-8")
 
-
 def check_password(hash_value: str, password: str) -> bool:
     return bcrypt.check_password_hash(hash_value, password)
-# Health check route
+
+# Health check
 @app.get("/")
 def home():
     return {"message": "Feedback Sentiment Analysis API is running", "status": "ok"}
@@ -78,14 +72,12 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    # auto-login after register; store id as string in JWT
     token = create_access_token(identity=str(user.id))
 
     return {
         "user": {"id": user.id, "name": user.full_name, "email": user.email},
         "token": token,
     }, 201
-
 
 @app.post("/api/login")
 def login():
@@ -134,13 +126,11 @@ def forgot_password():
 
     return {"message": "Password reset instructions (demo) would be sent."}
 
-# Feedback + sentiment
 @app.post("/api/feedback")
 @jwt_required()
 def create_feedback():
     user_id = int(get_jwt_identity())
     data = request.get_json(force=True, silent=True) or {}
-    print("FEEDBACK DATA:", data)
 
     message = str(data.get("message", "")).strip()
     if not message:
@@ -154,7 +144,7 @@ def create_feedback():
     elif polarity < -0.10:
         sentiment = "negative"
     else:
-        sentiment = "neutral"  # neutral band around zero.[web:119][web:121][web:130][web:123]
+        sentiment = "neutral"
 
     fb = Feedback(
         user_id=user_id,
@@ -174,7 +164,6 @@ def create_feedback():
 @app.get("/api/summary")
 @jwt_required()
 def summary():
-    # only needs token to be valid; user id is not used here
     total = Feedback.query.count()
     positive = Feedback.query.filter_by(sentiment="positive").count()
     neutral = Feedback.query.filter_by(sentiment="neutral").count()
@@ -199,4 +188,3 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(host='0.0.0.0', port=port, debug=False)
-
