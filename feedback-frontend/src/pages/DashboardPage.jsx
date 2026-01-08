@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { PieChart } from "react-minimal-pie-chart";
 
-const BASE_URL = "http://127.0.0.1:5000";
+import { API_BASE_URL } from '../config';
+const BASE_URL = API_BASE_URL;
+
 
 export default function DashboardPage() {
   const { token } = useAuth();

@@ -3,7 +3,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const BASE_URL = "http://127.0.0.1:5000"; // Flask server
+import { API_BASE_URL } from '../config';
+const BASE_URL = API_BASE_URL;
+
 
 export default function LoginPage() {
   const [identifier, setIdentifier] = useState("");
