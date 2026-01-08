@@ -15,7 +15,7 @@ load_dotenv()
 app = Flask(__name__)
 
 # Updated CORS for production deployment
-CORS(app, origins="*", supports_credentials=False)
+CORS(app) 
 
 
 
