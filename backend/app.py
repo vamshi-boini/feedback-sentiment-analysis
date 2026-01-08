@@ -189,6 +189,8 @@ def me():
     return {"id": user.id, "name": user.full_name, "email": user.email}
 
 if __name__ == "__main__":
+    port = int(os.getenv('PORT', 5000))
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)
+
