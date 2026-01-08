@@ -14,14 +14,14 @@ load_dotenv()
 
 app = Flask(__name__)
 
+# Updated CORS for production deployment
 CORS(
     app,
     resources={r"/api/*": {
         "origins": [
             "http://127.0.0.1:5173",
             "http://localhost:5173",
-            "https://feedback-sentiment-analysis-2rlr.vercel.app",  # Your Vercel domain
-            "https://*.vercel.app"  # Allow all Vercel preview deployments
+            "https://*.vercel.app"  # Allow all Vercel domains
         ]
     }},
     supports_credentials=True,
