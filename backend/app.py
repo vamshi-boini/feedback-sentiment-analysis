@@ -16,9 +16,17 @@ app = Flask(__name__)
 
 CORS(
     app,
-    resources={r"/api/*": {"origins": ["http://127.0.0.1:5173", "http://localhost:5173"]}},
+    resources={r"/api/*": {
+        "origins": [
+            "http://127.0.0.1:5173",
+            "http://localhost:5173",
+            "https://*.vercel.app",  # Allow Vercel
+            "https://feedback-sentiment-analysis-nlld.onrender.com"
+        ]
+    }},
     supports_credentials=True,
 )
+
 
 # Config
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret")
