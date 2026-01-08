@@ -61,6 +61,10 @@ def hash_password(password: str) -> str:
 
 def check_password(hash_value: str, password: str) -> bool:
     return bcrypt.check_password_hash(hash_value, password)
+# Health check route
+@app.get("/")
+def home():
+    return {"message": "Feedback Sentiment Analysis API is running", "status": "ok"}
 
 # Auth routes
 @app.post("/api/register")
